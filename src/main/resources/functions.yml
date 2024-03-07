@@ -1,0 +1,97 @@
+#Invsee 是名称，可以自定义
+#Need ess
+invsee:
+  item:
+    material: CHEST
+    slot: 1
+    name: '&3&lInvSee'
+    lore:
+      - '&3&l open %player_name% inventory'
+  #The 变量 player、other 和 event 可用
+  #the 脚本分别是触发播放器，
+  #the 交互式播放器，以及触发此脚本的事件。
+  script: |
+    player.closeInventory()
+    player.performCommand("invsee ${other.name}")
+    player.sendMessage('已打开对方玩家的背包')
+  isAsynchronous: false
+#ItemTrad
+itr:
+  item:
+    material: GRASS
+    slot: 1
+    name: '&3&lSend item trade request'
+    lore:
+      - '&3&lSend item trade request to %player name%'
+      - '&a&l[Click to send!]'
+  script: |
+    player.closeInventory()
+    player.performCommand("itr ${other.name}")
+  isAsynchronous: false
+#setFly
+setFly:
+  item:
+    material: ELYTRA
+    slot: 1
+    name: '&3&lSet %player_name% Fly status'
+    lore:
+      - '&a&lClick the switch %player_name% flight status'
+  script: |
+    player.closeInventory()
+    player.performCommand("fly ${other.name}")
+#Need ess
+giveMoney:
+  item:
+    material: GOLD_INGOT
+    slot: 1
+    name: '&3&lGive money'
+    lore:
+      - '&e&lClick and enter the price in the input box!'
+  script: |
+    import org.bukkit.Bukkit
+    import org.bukkit.event.Event
+    import org.bukkit.event.EventException
+    import org.bukkit.event.EventPriority
+    import org.bukkit.event.Listener
+    import org.bukkit.event.player.AsyncPlayerChatEvent
+    import org.bukkit.plugin.EventExecutor
+    import org.bukkit.scheduler.BukkitRunnable
+    //定期删除侦听器
+    def i = 60
+    def plugin = Bukkit.getPluginManager().getPlugin('PlayerInteract')
+    def listener = new Listener() {}
+    def executor = new EventExecutor() {
+        @Override
+        void execute(Listener l,Event event) throws EventException {
+            def e = event as AsyncPlayerChatEvent
+            if (e.player != player) {
+                return
+            }
+            e.cancelled = true;
+            try {
+                def value = Integer.parseInt(e.message)
+                player.performCommand("pay ${other.getName()} ${value}")
+            } catch (NumberFormatException ignored) {
+                e.player.sendMessage("§6§lThe input is not a number!")
+            }
+            //Register listener
+            AsyncPlayerChatEvent.getHandlerList().unregister(listener)
+        }
+    }
+    //注册侦听器
+    plugin.getServer().getPluginManager().registerEvent(AsyncPlayerChatEvent.class, listener, EventPriority.NORMAL, executor, plugin)
+    player.sendMessage("§6§lPlease enter the value to be paid!")
+    player.closeInventory()
+    //Start a scheduled task
+    def runnable = new BukkitRunnable() {
+        @Override
+        void run() {
+            if (player != null) {
+                player.sendMessage("§c§lPayment timed out!")
+            }
+            AsyncPlayerChatEvent.getHandlerList().unregister(listener)
+        }
+    }
+    runnable.runTaskLater(plugin, i * 20);
+
+#

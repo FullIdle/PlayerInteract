@@ -1,0 +1,20 @@
+##不可以配置没有功能的功能页
+op:
+  peiority: 0
+  title: "§6§l%player_name% §c§l[OP-Manage-GUI]"
+  functions:
+    - 'invsee'
+    - 'itr'
+    - 'giveMoney'
+    - 'setFly'
+##主要配置功能列表
+player:
+  ##权重,小优先,玩家拥有多个交互gui界面权限的时候更具权重来判断给玩家打开那个gui
+  # 可以自己写个op专用的交互界面,方便玩坏.呸呸呸.管理玩家
+  priority: 1
+  ##变量传入的玩家是被交互的玩家~
+  title: "%player_name%"
+  ##可以多个功能,超出10个自动实现翻页功能
+  functions:
+    - 'itr'
+    - 'giveMoney'

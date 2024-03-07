@@ -1,0 +1,26 @@
+name: ${rootProject.name}
+main: ${group}
+version: ${version}
+depend:
+  - 'FICore'
+  - 'FIScript'
+  - 'PlaceholderAPI'
+commands:
+  playerinteract:
+    description: plugin main command||/pinter help -View help
+    aliases: [pinter]
+    usage: |
+      /pinter help §7-View help§r
+      /pinter [args] [OPTIONAL] §7-usage
+  itemtraderequest:
+    description: Send item trade request to specified player
+    aliases: [itr]
+    usage: /itr [player]
+  itemtradeyes:
+    description: Accept item trade requests from specified players
+    aliases: [itryes]
+    usage: /itryes [player]
+  itemtradeno:
+    description: Deny the specified player's item trade request
+    aliases: [itrno]
+    usage: /itrno [player]
