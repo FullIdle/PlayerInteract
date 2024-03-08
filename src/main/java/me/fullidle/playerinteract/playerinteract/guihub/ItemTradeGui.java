@@ -73,7 +73,9 @@ public class ItemTradeGui extends ListenerInvHolder {
             }
             //如果是确认按钮 [4个状态]
             if (e.getSlot() == 4){
-                if (item.getType().equals(Material.NETHER_STAR) && item.containsEnchantment(Enchantment.LUCK)){
+                boolean isReadPlayer = this.readyPlayer == whoClicked;
+                if (item.getType().equals(Material.NETHER_STAR)){
+                    if (isReadPlayer) return;
                     //完成交易
                     this.complete = true;
                     //交换物品
@@ -87,7 +89,7 @@ public class ItemTradeGui extends ListenerInvHolder {
                     return;
                 }
                 //其他情况全部进行阶段变更
-                if (this.readyPlayer != whoClicked) nextState(whoClicked);
+                if (!isReadPlayer) nextState(whoClicked);
                 return;
             }
             //不是按状态按钮的时候
@@ -136,18 +138,13 @@ public class ItemTradeGui extends ListenerInvHolder {
         Material type = item.getType();
         Material eye = Material.getMaterial(MethodUtil.isHighVersion() ? "ENDER_EYE" : "EYE_OF_ENDER");
         assert eye != null;
-        if (type.equals(Material.NETHER_STAR)){
-            if (item.containsEnchantment(Enchantment.LUCK))return;
-            item.addUnsafeEnchantment(Enchantment.LUCK,1);
-            this.readyPlayer = whoClick;
-        }
         if (type.equals(eye)){
             item.setType(Material.NETHER_STAR);
         }
         if (type.equals(Material.ENDER_PEARL)) {
             item.setType(eye);
-            this.readyPlayer = whoClick;
         }
+        this.readyPlayer = whoClick;
     }
 
     @Getter
