@@ -3,6 +3,7 @@ package me.fullidle.playerinteract.playerinteract;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import me.fullidle.ficore.ficore.common.api.util.FileUtil;
+import me.fullidle.playerinteract.playerinteract.commands.PlayerInteractCmd;
 import org.bukkit.Material;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.command.TabExecutor;
@@ -50,7 +51,8 @@ public class Main extends JavaPlugin {
                 PluginCommand command = getCommand(cmdName.toLowerCase());
                 command.setExecutor(tabE);
                 command.setTabCompleter(tabE);
-                command.setPermission(getDescription().getName().toLowerCase()+"."+cmdName.toLowerCase());
+                if (!aClass.equals(PlayerInteractCmd.class))
+                    command.setPermission(getDescription().getName().toLowerCase()+"."+cmdName.toLowerCase());
                 getLogger().info("§3  - §6/"+command.getName()+"§r: "+command.getDescription());
             }
         }

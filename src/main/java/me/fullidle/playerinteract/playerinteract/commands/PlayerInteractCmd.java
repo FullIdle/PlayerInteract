@@ -31,17 +31,28 @@ public class PlayerInteractCmd implements TabExecutor {
                         return true;
                     }
                     case "reload": {
+                        String per = getSubPermission("reload");
+                        if (!sender.hasPermission(per)){
+                            sender.sendMessage("§c§lMissing permissions:§r§3"+per);
+                        }
+
                         //重载
                         plugin.reloadConfig();
                         sender.sendMessage("§6§lReload successful!");
                         return true;
                     }
                     case "open": {
+                        String per = getSubPermission("open");
+                        if (!sender.hasPermission(per)){
+                            sender.sendMessage("§c§lMissing permissions:§r§3"+per);
+                        }
+
                         //打开交互gui
                         if (args.length >= 2){
                             boolean b = args.length>=3;
-                            if (b&&sender.hasPermission("playerinteract.playerinteract.for")){
-                                sender.sendMessage("§c§lMissing permissions:§r§3playerinteract.playerinteract.for");
+                            String forPer = getSubPermission("for");
+                            if (b&&!sender.hasPermission(forPer)){
+                                sender.sendMessage("§c§lMissing permissions:§r§3"+forPer);
                                 return true;
                             }
                             String otherName = b?args[2]:args[1];
@@ -87,5 +98,10 @@ public class PlayerInteractCmd implements TabExecutor {
         if (args.length < 1) return sub;
         if (args.length == 1) return sub.stream().filter(s->s.startsWith(args[0])).collect(Collectors.toList());
         return null;
+    }
+
+    public String getSubPermission(String sub){
+        String lowerCasePlugin = plugin.getName().toLowerCase();
+        return lowerCasePlugin + "." + lowerCasePlugin + "." + sub;
     }
 }
