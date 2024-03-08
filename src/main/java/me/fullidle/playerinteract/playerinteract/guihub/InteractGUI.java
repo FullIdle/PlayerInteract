@@ -13,10 +13,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -36,7 +33,18 @@ public class InteractGUI extends ListenerInvHolder {
     private String guiKey;
     private Function[][] groupFunctions = new Function[1][0];
     private Integer page;
-    private final Map<ItemStack,Function> correspondMap = new HashMap<>();
+    private final Map<ItemStack,Function> correspondMap = new HashMap<ItemStack,Function>(){
+        @Override
+        public Function get(Object key) {
+            ItemStack i = (ItemStack) key;
+            for (Entry<ItemStack, Function> entry : entrySet()) {
+                if (entry.getKey().equals(i)||(entry.getKey().getAmount()==i.getAmount()&&entry.getKey().isSimilar(i))) {
+                    return entry.getValue();
+                }
+            }
+            return null;
+        }
+    };
 
     public InteractGUI(Player player,Player openPlayer) {
         this.openPlayer = openPlayer;
@@ -144,7 +152,8 @@ public class InteractGUI extends ListenerInvHolder {
             //判断是否是功能区
             if (functionSlot.contains(slot)){
                 Function function = correspondMap.get(currentItem);
-                function.extScript(e,((Player) e.getWhoClicked()),player);
+                Player whoClicked = (Player) e.getWhoClicked();
+                function.extScript(e, whoClicked,player);
                 return;
             }
 
@@ -158,7 +167,6 @@ public class InteractGUI extends ListenerInvHolder {
                     return;
                 }
                 changePage(target);
-                return;
             }
         });
         //使无法拖拽

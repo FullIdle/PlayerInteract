@@ -40,7 +40,8 @@ public class Function{
         ItemMeta itemMeta = itemStack.getItemMeta();
         itemMeta.setDisplayName(MethodUtil.colorPapi(itemMeta.getDisplayName(),player));
         itemMeta.setLore(((List<String>) MethodUtil.colorPapi(itemMeta.getLore(), player)));
-        itemStack.setItemMeta(itemMeta);
-        return itemStack;
+        ItemStack clone = itemStack.clone();
+        clone.setItemMeta(itemMeta);
+        return clone;
     }
 }

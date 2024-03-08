@@ -56,10 +56,46 @@ giveMoney:
     import org.bukkit.event.player.AsyncPlayerChatEvent
     import org.bukkit.plugin.EventExecutor
     import org.bukkit.scheduler.BukkitRunnable
+    import org.bukkit.metadata.FixedMetadataValue
+    
+    def plugin = Bukkit.getPluginManager().getPlugin('PlayerInteract')
+    //防止重复点击的内容↓
+    //用entity内的metaData,有想过用权限的可是我脑子不够,总觉得临时权限要是没有去掉之后一段时间内都没办法点击了。。。
+    //判断数据
+    if (player.hasMetadata("waitInputPay")){
+        for (final def v in player.getMetadata("waitInputPay")) {
+            if (v.owningPlugin == plugin) {
+                if (v as Boolean) {
+                    player.sendMessage("§6§lPlease click on [You can enter non-numbers directly to finish] after the payment is finished.")
+                    player.closeInventory()
+                    return
+                }
+            }
+        }
+    }
+    //给上数据
+    player.setMetadata("waitInputPay",new FixedMetadataValue(plugin,true))
+    //防止重复点击的内容↑
+    
+    
+    //初始化一些东西
     //定期删除侦听器
     def i = 60
-    def plugin = Bukkit.getPluginManager().getPlugin('PlayerInteract')
+    //监听器对象
     def listener = new Listener() {}
+    //要定时的任务
+    def runnable = new BukkitRunnable() {
+        @Override
+        void run() {
+            if (player != null) {
+                player.sendMessage("§c§lPayment timed out!")
+            }
+            AsyncPlayerChatEvent.class.getHandlerList().unregister(listener)
+            //删除数据
+            player.removeMetadata("waitInputPay",plugin)
+        }
+    }
+    //执行的内容
     def executor = new EventExecutor() {
         @Override
         void execute(Listener l,Event event) throws EventException {
@@ -74,8 +110,11 @@ giveMoney:
             } catch (NumberFormatException ignored) {
                 e.player.sendMessage("§6§lThe input is not a number!")
             }
-            //Register listener
+            //Register listener and runnable
             AsyncPlayerChatEvent.getHandlerList().unregister(listener)
+            runnable.cancel()
+            //删除数据
+            player.removeMetadata("waitInputPay",plugin)
         }
     }
     //注册侦听器
@@ -83,15 +122,4 @@ giveMoney:
     player.sendMessage("§6§lPlease enter the value to be paid!")
     player.closeInventory()
     //Start a scheduled task
-    def runnable = new BukkitRunnable() {
-        @Override
-        void run() {
-            if (player != null) {
-                player.sendMessage("§c§lPayment timed out!")
-            }
-            AsyncPlayerChatEvent.getHandlerList().unregister(listener)
-        }
-    }
     runnable.runTaskLater(plugin, i * 20);
-
-#
